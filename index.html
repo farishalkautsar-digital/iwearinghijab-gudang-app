@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>IWearingHijab - Gudang V1.0</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet">
@@ -14,14 +15,56 @@
     .brand-color { background-color: #d81b60; color: white; }
     .brand-color:hover { background-color: #ad144b; color: white; }
     .text-brand { color: #d81b60; }
+    
+    /* Login Section */
     #login-section { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); }
     .login-card { width: 400px; padding: 40px; border-radius: 15px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    #app-section { display: none; min-height: 100vh; }
-    .sidebar { width: 250px; background: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.05); padding-top: 20px; z-index: 10; }
+    
+    /* App Section (Desktop Base Layout) */
+    #app-section { display: none; min-height: 100vh; flex-direction: row; }
+    .sidebar { width: 250px; background: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.05); padding-top: 20px; z-index: 10; transition: all 0.3s; }
     .sidebar .nav-link { color: #495057; padding: 15px 25px; font-weight: 500; border-left: 4px solid transparent; cursor: pointer; transition: all 0.2s; }
     .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #fce4ec; color: #d81b60; border-left: 4px solid #d81b60; }
     .main-content { flex: 1; padding: 30px; overflow-y: auto; height: 100vh; }
+    
+    /* Loader */
     #loader { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.8); z-index: 9999; text-align: center; padding-top: 40vh; }
+
+    /* =========================================
+       RESPONSIVE MOBILE (Max Width 768px)
+       ========================================= */
+    @media (max-width: 768px) {
+      /* Ubah struktur flex menjadi kolom */
+      #app-section { flex-direction: column; }
+      
+      /* Ruang kosong di bawah untuk Bottom Nav */
+      .main-content { padding: 15px; padding-bottom: 90px; height: auto; }
+      
+      /* Merombak Sidebar menjadi Bottom Navigation Bar */
+      .sidebar { width: 100%; height: 70px; position: fixed; bottom: 0; left: 0; padding: 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); z-index: 1050; display: flex; align-items: center; }
+      
+      /* Sembunyikan Logo/Header di Navbar Bawah */
+      .sidebar .text-center { display: none; }
+      
+      /* Susun menu ke samping */
+      .sidebar #menu-tabs { flex-direction: row !important; width: 100%; height: 100%; justify-content: space-around; margin: 0; padding: 0; align-items: center; }
+      
+      /* Styling tombol menu ala Aplikasi HP */
+      .sidebar .nav-link { padding: 8px 2px; font-size: 11px; text-align: center; border-left: none; border-top: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      .sidebar .nav-link i { margin: 0 0 5px 0 !important; font-size: 20px; }
+      .sidebar .nav-link:hover, .sidebar .nav-link.active { border-left: none; border-top: 3px solid #d81b60; background: transparent; color: #d81b60; }
+      
+      /* Hilangkan margin besar di tombol keluar */
+      .sidebar li.mt-5 { margin-top: 0 !important; }
+
+      /* Penyesuaian Login Form agar tidak terpotong */
+      .login-card { width: 90%; padding: 25px; }
+
+      /* Penyesuaian DataTables (Tombol & Search Box ke tengah) */
+      .dt-buttons { display: flex; justify-content: center; margin-bottom: 10px; gap: 5px; }
+      .dataTables_filter { text-align: center !important; margin-top: 10px; }
+      .dataTables_filter input { width: 100%; margin-left: 0 !important; margin-top: 5px; }
+    }
   </style>
 </head>
 <body>
@@ -41,35 +84,39 @@
     </div>
   </div>
 
-  <div id="app-section" class="d-flex">
+  <div id="app-section">
+    
     <div class="sidebar">
-      <div class="text-center mb-4 px-3"><h5 class="fw-bold text-brand">IWearingHijab</h5><small class="text-muted" id="user-info"></small></div>
+      <div class="text-center mb-4 px-3"><h5 class="fw-bold text-brand mt-2">IWearingHijab</h5><small class="text-muted" id="user-info"></small></div>
       <ul class="nav flex-column" id="menu-tabs">
         <li><a class="nav-link active" onclick="switchTab('dashboard')"><i class="fas fa-chart-pie me-2"></i> Dashboard</a></li>
-        <li><a class="nav-link" onclick="switchTab('master')"><i class="fas fa-box-open me-2"></i> Master Produk</a></li>
+        <li><a class="nav-link" onclick="switchTab('master')"><i class="fas fa-box-open me-2"></i> Produk</a></li>
         <li><a class="nav-link" onclick="switchTab('stok')"><i class="fas fa-exchange-alt me-2"></i> Input Stok</a></li>
-        <li class="mt-5"><a class="nav-link text-danger" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i> Keluar Sistem</a></li>
+        <li class="mt-5"><a class="nav-link text-danger" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i> Keluar</a></li>
       </ul>
     </div>
 
     <div class="main-content">
+      
       <div id="tab-dashboard" class="content-tab">
-        <h4 class="mb-4">Overview Sisa Stok</h4>
-        <div class="card p-4 border-0 shadow-sm">
-          <table id="tabelDashboard" class="table table-striped table-hover w-100 align-middle">
-            <thead class="table-dark"><tr><th>Kategori</th><th>Nama Produk (Ukuran & Warna)</th><th>Kuantitas Sisa</th></tr></thead>
-            <tbody></tbody>
-          </table>
+        <h4 class="mb-4 fw-bold">Overview Sisa Stok</h4>
+        <div class="card p-3 p-md-4 border-0 shadow-sm">
+          <div class="table-responsive">
+            <table id="tabelDashboard" class="table table-striped table-hover w-100 align-middle">
+              <thead class="table-dark"><tr><th>Kategori</th><th>Nama Produk (Ukuran & Warna)</th><th>Kuantitas Sisa</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       <div id="tab-master" class="content-tab" style="display: none;">
-        <h4 class="mb-4">Kelola Master Produk</h4>
-        <div class="card p-4 border-0 shadow-sm mb-4">
+        <h4 class="mb-4 fw-bold">Kelola Master Produk</h4>
+        <div class="card p-3 p-md-4 border-0 shadow-sm mb-4">
           <form id="formProduk" onsubmit="submitProduk(event)">
             <input type="hidden" id="edit_id_produk" value="">
             <div class="row">
-              <div class="col-md-3 mb-3">
+              <div class="col-md-3 col-12 mb-3">
                 <label class="form-label fw-semibold">Kategori</label>
                 <select id="kategori" class="form-select" required>
                   <option value="">-- Pilih --</option>
@@ -78,42 +125,45 @@
                   <option value="Aksesoris/Lainnya">Aksesoris / Lainnya</option>
                 </select>
               </div>
-              <div class="col-md-4 mb-3"><label class="form-label fw-semibold">Nama Produk</label><input type="text" id="nama" class="form-control" placeholder="Misal: Paris Jadul" required></div>
-              <div class="col-md-2 mb-3"><label class="form-label fw-semibold">Ukuran</label><input type="text" id="ukuran" class="form-control" placeholder="110x110 cm" required></div>
-              <div class="col-md-3 mb-3"><label class="form-label fw-semibold">Warna</label><input type="text" id="warna" class="form-control" placeholder="Sage Green" required></div>
+              <div class="col-md-4 col-12 mb-3"><label class="form-label fw-semibold">Nama Produk</label><input type="text" id="nama" class="form-control" placeholder="Misal: Paris Jadul" required></div>
+              <div class="col-md-2 col-12 mb-3"><label class="form-label fw-semibold">Ukuran</label><input type="text" id="ukuran" class="form-control" placeholder="110x110 cm" required></div>
+              <div class="col-md-3 col-12 mb-3"><label class="form-label fw-semibold">Warna</label><input type="text" id="warna" class="form-control" placeholder="Sage Green" required></div>
             </div>
-            <div class="d-flex gap-2">
-              <button type="submit" class="btn brand-color" id="btn-submit-produk"><i class="fas fa-save me-2"></i>Simpan Produk Baru</button>
-              <button type="button" class="btn btn-secondary" id="btn-batal-edit" style="display:none;" onclick="batalEdit()"><i class="fas fa-times me-2"></i>Batal Edit</button>
+            <div class="d-flex flex-column flex-md-row gap-2">
+              <button type="submit" class="btn brand-color w-100" id="btn-submit-produk"><i class="fas fa-save me-2"></i>Simpan Produk Baru</button>
+              <button type="button" class="btn btn-secondary w-100" id="btn-batal-edit" style="display:none;" onclick="batalEdit()"><i class="fas fa-times me-2"></i>Batal Edit</button>
             </div>
           </form>
         </div>
-        <div class="card p-4 border-0 shadow-sm">
-          <table id="tabelMaster" class="table table-striped table-hover w-100 align-middle">
-            <thead class="table-dark"><tr><th>ID</th><th>Kategori</th><th>Nama Produk</th><th>Ukuran</th><th>Warna</th><th width="100px">Aksi</th></tr></thead>
-            <tbody></tbody>
-          </table>
+        <div class="card p-3 p-md-4 border-0 shadow-sm">
+          <div class="table-responsive">
+            <table id="tabelMaster" class="table table-striped table-hover w-100 align-middle">
+              <thead class="table-dark"><tr><th>ID</th><th>Kategori</th><th>Nama Produk</th><th>Ukuran</th><th>Warna</th><th width="100px">Aksi</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
       <div id="tab-stok" class="content-tab" style="display: none;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h4>Catat Lalu Lintas Barang</h4><button class="btn btn-success disabled" title="Akan hadir di pembaruan sistem berikutnya"><i class="fas fa-file-excel me-2"></i>Upload Excel Kasir (Coming Soon)</button>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+          <h4 class="fw-bold mb-0">Catat Lalu Lintas Barang</h4>
+          <button class="btn btn-success disabled w-100 w-md-auto" title="Akan hadir di pembaruan sistem berikutnya"><i class="fas fa-file-excel me-2"></i>Upload Excel Kasir</button>
         </div>
-        <div class="card p-4 border-0 shadow-sm col-md-8">
+        <div class="card p-3 p-md-4 border-0 shadow-sm col-md-8">
           <form id="formLog" onsubmit="submitLog(event)">
             <div class="mb-3"><label class="form-label fw-semibold">Pilih Produk</label><select id="id_produk" class="form-select" required></select></div>
             <div class="row">
-              <div class="col-md-6 mb-3">
+              <div class="col-md-6 col-12 mb-3">
                 <label class="form-label fw-semibold">Tipe Transaksi</label>
                 <select id="tipe" class="form-select" required>
                   <option value="In">Barang Masuk (In)</option><option value="Out">Barang Keluar (Out)</option><option value="Adj">Penyesuaian (Adjustment)</option>
                 </select>
               </div>
-              <div class="col-md-6 mb-3"><label class="form-label fw-semibold">Kuantitas</label><input type="number" id="qty" class="form-control" min="1" required></div>
+              <div class="col-md-6 col-12 mb-3"><label class="form-label fw-semibold">Kuantitas</label><input type="number" id="qty" class="form-control" min="1" required></div>
             </div>
             <div class="mb-4"><label class="form-label fw-semibold">Keterangan Tambahan</label><input type="text" id="keterangan" class="form-control" placeholder="Opsional..."></div>
-            <button type="submit" class="btn brand-color"><i class="fas fa-check-circle me-2"></i>Proses Data Stok</button>
+            <button type="submit" class="btn brand-color w-100"><i class="fas fa-check-circle me-2"></i>Proses Data Stok</button>
           </form>
         </div>
       </div>
@@ -130,7 +180,7 @@
   
   <script>
     // ================= SANGAT PENTING: GANTI URL DI BAWAH INI =================
-    const API_URL = "https://script.google.com/macros/s/AKfycbwJAzN53VkinXr0PxRWU96imVvIVqHqyIH21LPZgklgYNkdAvfWeN9MOI1FpJpOCMFe/exec"; 
+    const API_URL = "ISI_URL_WEB_APP_KAMU_DISINI"; 
     
     let dtTable, dtMaster;
 
@@ -187,8 +237,8 @@
           language: { search: "Cari Produk:", lengthMenu: "_MENU_", info: "Tampil _START_ s/d _END_ dari _TOTAL_" },
           pageLength: 15, destroy: true,
           buttons: [
-            { extend: 'excelHtml5', className: 'btn btn-success btn-sm me-2', text: '<i class="fas fa-file-excel me-1"></i> Unduh Excel', title: 'Stok IWearingHijab' },
-            { extend: 'csvHtml5', className: 'btn btn-info btn-sm text-white', text: '<i class="fas fa-file-csv me-1"></i> Unduh CSV', title: 'Stok IWearingHijab' }
+            { extend: 'excelHtml5', className: 'btn btn-success btn-sm me-1', text: '<i class="fas fa-file-excel"></i> Excel', title: 'Stok IWearingHijab' },
+            { extend: 'csvHtml5', className: 'btn btn-info btn-sm text-white', text: '<i class="fas fa-file-csv"></i> CSV', title: 'Stok IWearingHijab' }
           ]
         });
         dtTable.buttons().container().appendTo('#tabelDashboard_wrapper .col-md-6:eq(0)');
