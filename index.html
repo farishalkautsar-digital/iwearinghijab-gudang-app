@@ -180,7 +180,7 @@
   
   <script>
     // ================= SANGAT PENTING: GANTI URL DI BAWAH INI =================
-    const API_URL = "https://script.google.com/macros/s/AKfycbwJAzN53VkinXr0PxRWU96imVvIVqHqyIH21LPZgklgYNkdAvfWeN9MOI1FpJpOCMFe/exec"; 
+    const API_URL = "ISI_URL_WEB_APP_KAMU_DISINI"; 
     
     let dtTable, dtMaster;
 
@@ -208,3 +208,130 @@
 
     async function prosesLogin(e) {
       e.preventDefault(); showLoader();
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      try {
+        const res = await callAPI('login', {username: u, password: p});
+        hideLoader();
+        if(res.status === 'success') {
+          localStorage.setItem('iw_user', res.nama);
+          document.getElementById('user-info').innerText = `Halo, ${res.nama}`;
+          Swal.fire({ icon: 'success', title: 'Akses Diterima', text: `Selamat bekerja!`, timer: 1500, showConfirmButton: false });
+          showApp();
+        } else { Swal.fire('Ditolak', res.message, 'error'); }
+      } catch(err) { hideLoader(); Swal.fire('Error', 'Gagal memanggil API Server', 'error'); }
+    }
+
+    function logout() { localStorage.removeItem('iw_user'); location.reload(); }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.content-tab').forEach(t => t.style.display = 'none');
+      document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).style.display = 'block';
+      event.currentTarget.classList.add('active');
+    }
+
+    function initDataTables() {
+      if (!$.fn.DataTable.isDataTable('#tabelDashboard')) {
+        dtTable = $('#tabelDashboard').DataTable({
+          language: { search: "Cari Produk:", lengthMenu: "_MENU_", info: "Tampil _START_ s/d _END_ dari _TOTAL_" },
+          pageLength: 15, destroy: true,
+          buttons: [
+            { extend: 'excelHtml5', className: 'btn btn-success btn-sm me-1', text: '<i class="fas fa-file-excel"></i> Excel', title: 'Stok IWearingHijab' },
+            { extend: 'csvHtml5', className: 'btn btn-info btn-sm text-white', text: '<i class="fas fa-file-csv"></i> CSV', title: 'Stok IWearingHijab' }
+          ]
+        });
+        dtTable.buttons().container().appendTo('#tabelDashboard_wrapper .col-md-6:eq(0)');
+      }
+      if (!$.fn.DataTable.isDataTable('#tabelMaster')) {
+        dtMaster = $('#tabelMaster').DataTable({ language: { search: "Cari Data:", lengthMenu: "_MENU_", info: "Tampil _START_ s/d _END_ dari _TOTAL_" }, pageLength: 10, destroy: true });
+      }
+    }
+
+    function showApp() {
+      document.getElementById('login-section').style.display = 'none';
+      document.getElementById('app-section').style.display = 'flex';
+      initDataTables();
+      loadDashboard(true); loadMasterProdukTable(false); loadDropdownProduk(false);
+    }
+
+    async function loadDashboard(loading = true) {
+      if(loading) showLoader();
+      try {
+        const data = await callAPI('getDashboardData');
+        if(loading) hideLoader();
+        dtTable.clear(); dtTable.rows.add(data); dtTable.draw();
+      } catch(e) { hideLoader(); console.error(e); }
+    }
+
+    async function loadMasterProdukTable(loading = true) {
+      if(loading) showLoader();
+      try {
+        const data = await callAPI('getDaftarProdukTable');
+        if(loading) hideLoader();
+        dtMaster.clear(); dtMaster.rows.add(data); dtMaster.draw();
+      } catch(e) { hideLoader(); console.error(e); }
+    }
+
+    async function submitProduk(e) {
+      e.preventDefault(); showLoader();
+      const idEdit = document.getElementById('edit_id_produk').value;
+      const data = { id: idEdit, kategori: document.getElementById('kategori').value, nama: document.getElementById('nama').value, ukuran: document.getElementById('ukuran').value, warna: document.getElementById('warna').value };
+      try {
+        const res = await callAPI(idEdit === "" ? 'simpanProduk' : 'prosesEditProduk', idEdit === "" ? {payload: data} : {payload: data});
+        hideLoader();
+        if(res.status === 'success') { Swal.fire('Berhasil!', res.message, 'success'); batalEdit(); loadMasterProdukTable(false); loadDropdownProduk(false); loadDashboard(false); }
+        else { Swal.fire('Gagal!', res.message, 'error'); }
+      } catch(e) { hideLoader(); Swal.fire('Error', 'Terjadi kesalahan sistem', 'error'); }
+    }
+
+    function siapkanEdit(id, kat, nama, uk, warna) {
+      document.getElementById('edit_id_produk').value = id; document.getElementById('kategori').value = kat; document.getElementById('nama').value = nama; document.getElementById('ukuran').value = uk; document.getElementById('warna').value = warna;
+      const btn = document.getElementById('btn-submit-produk'); btn.innerHTML = '<i class="fas fa-save me-2"></i>Update Data'; btn.classList.replace('brand-color', 'btn-warning');
+      document.getElementById('btn-batal-edit').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function batalEdit() {
+      document.getElementById('formProduk').reset(); document.getElementById('edit_id_produk').value = "";
+      const btn = document.getElementById('btn-submit-produk'); btn.innerHTML = '<i class="fas fa-save me-2"></i>Simpan Produk Baru'; btn.classList.replace('btn-warning', 'brand-color');
+      document.getElementById('btn-batal-edit').style.display = 'none';
+    }
+
+    function hapusProduk(id) {
+      Swal.fire({ title: 'Hapus Master Produk?', text: "Data hilang permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: 'Ya, Hapus!'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          showLoader();
+          try {
+            const res = await callAPI('prosesHapusProduk', {id: id});
+            hideLoader();
+            if(res.status === 'success') { Swal.fire('Terhapus!', res.message, 'success'); loadMasterProdukTable(false); loadDropdownProduk(false); loadDashboard(false); }
+            else { Swal.fire('Error', res.message, 'error'); }
+          } catch(e) { hideLoader(); }
+        }
+      });
+    }
+
+    async function loadDropdownProduk(loading = true) {
+      if(loading) showLoader();
+      try {
+        const data = await callAPI('getDaftarProduk');
+        if(loading) hideLoader();
+        let sel = document.getElementById('id_produk'); sel.innerHTML = '<option value="">-- Pilih --</option>';
+        data.forEach(i => sel.innerHTML += `<option value="${i.id}">${i.nama}</option>`);
+      } catch(e) { hideLoader(); }
+    }
+
+    async function submitLog(e) {
+      e.preventDefault(); showLoader();
+      const data = { id_produk: document.getElementById('id_produk').value, tipe: document.getElementById('tipe').value, qty: document.getElementById('qty').value, keterangan: document.getElementById('keterangan').value };
+      try {
+        const res = await callAPI('simpanLogStok', {payload: data});
+        hideLoader();
+        if(res.status === 'success') { Swal.fire('Tersimpan!', res.message, 'success'); document.getElementById('formLog').reset(); loadDashboard(false); }
+        else { Swal.fire('Gagal!', res.message, 'error'); }
+      } catch(e) { hideLoader(); Swal.fire('Error', 'Sistem gagal merespon', 'error'); }
+    }
+  </script>
+</body>
+</html>
