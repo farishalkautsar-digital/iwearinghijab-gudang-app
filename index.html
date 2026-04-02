@@ -180,7 +180,7 @@
   
   <script>
     // ================= SANGAT PENTING: GANTI URL DI BAWAH INI =================
-    const API_URL = "https://script.google.com/macros/s/AKfycbwJAzN53VkinXr0PxRWU96imVvIVqHqyIH21LPZgklgYNkdAvfWeN9MOI1FpJpOCMFe/exec"; 
+    const API_URL = "ISI_URL_WEB_APP_KAMU_DISINI"; 
     
     let dtTable, dtMaster;
 
@@ -276,11 +276,25 @@
     async function submitProduk(e) {
       e.preventDefault(); showLoader();
       const idEdit = document.getElementById('edit_id_produk').value;
-      const data = { id: idEdit, kategori: document.getElementById('kategori').value, nama: document.getElementById('nama').value, ukuran: document.getElementById('ukuran').value, warna: document.getElementById('warna').value };
+      const data = { 
+        id: idEdit, 
+        kategori: document.getElementById('kategori').value, 
+        nama: document.getElementById('nama').value, 
+        ukuran: document.getElementById('ukuran').value, 
+        warna: document.getElementById('warna').value 
+      };
+      
       try {
-        const res = await callAPI(idEdit === "" ? 'simpanProduk' : 'prosesEditProduk', idEdit === "" ? {payload: data} : {payload: data});
+        // PERBAIKAN: Mengirim objek data secara langsung
+        const res = await callAPI(idEdit === "" ? 'simpanProduk' : 'prosesEditProduk', data);
         hideLoader();
-        if(res.status === 'success') { Swal.fire('Berhasil!', res.message, 'success'); batalEdit(); loadMasterProdukTable(false); loadDropdownProduk(false); loadDashboard(false); }
+        if(res.status === 'success') { 
+          Swal.fire('Berhasil!', res.message, 'success'); 
+          batalEdit(); 
+          loadMasterProdukTable(false); 
+          loadDropdownProduk(false); 
+          loadDashboard(false); 
+        }
         else { Swal.fire('Gagal!', res.message, 'error'); }
       } catch(e) { hideLoader(); Swal.fire('Error', 'Terjadi kesalahan sistem', 'error'); }
     }
@@ -324,11 +338,22 @@
 
     async function submitLog(e) {
       e.preventDefault(); showLoader();
-      const data = { id_produk: document.getElementById('id_produk').value, tipe: document.getElementById('tipe').value, qty: document.getElementById('qty').value, keterangan: document.getElementById('keterangan').value };
+      const data = { 
+        id_produk: document.getElementById('id_produk').value, 
+        tipe: document.getElementById('tipe').value, 
+        qty: document.getElementById('qty').value, 
+        keterangan: document.getElementById('keterangan').value 
+      };
+      
       try {
-        const res = await callAPI('simpanLogStok', {payload: data});
+        // PERBAIKAN: Mengirim objek data secara langsung
+        const res = await callAPI('simpanLogStok', data);
         hideLoader();
-        if(res.status === 'success') { Swal.fire('Tersimpan!', res.message, 'success'); document.getElementById('formLog').reset(); loadDashboard(false); }
+        if(res.status === 'success') { 
+          Swal.fire('Tersimpan!', res.message, 'success'); 
+          document.getElementById('formLog').reset(); 
+          loadDashboard(false); 
+        }
         else { Swal.fire('Gagal!', res.message, 'error'); }
       } catch(e) { hideLoader(); Swal.fire('Error', 'Sistem gagal merespon', 'error'); }
     }
