@@ -91,7 +91,7 @@
         <h4 class="mb-4 fw-bold">Kelola Master Produk</h4>
         <div class="card p-3 p-md-4 border-0 shadow-sm mb-4">
           <form id="formProduk" onsubmit="submitProduk(event)">
-            <input type="hidden" id="edit_id_produk" value="">
+            <input type="hidden" id="edit_sku_produk" value="">
             <div class="row">
               <div class="col-md-4 col-12 mb-3">
                 <label class="form-label fw-semibold">Kategori</label>
@@ -114,7 +114,7 @@
         <div class="card p-3 p-md-4 border-0 shadow-sm">
           <div class="table-responsive">
             <table id="tabelMaster" class="table table-striped table-hover w-100 align-middle">
-              <thead class="table-dark"><tr><th>ID</th><th>Kategori</th><th>Nama Produk</th><th>Warna</th><th width="100px">Aksi</th></tr></thead>
+              <thead class="table-dark"><tr><th>SKU</th><th>Kategori</th><th>Nama Produk</th><th>Warna</th><th width="100px">Aksi</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -128,7 +128,7 @@
         </div>
         <div class="card p-3 p-md-4 border-0 shadow-sm col-md-8">
           <form id="formLog" onsubmit="submitLog(event)">
-            <div class="mb-3"><label class="form-label fw-semibold">Pilih Produk</label><select id="id_produk" class="form-select" required></select></div>
+            <div class="mb-3"><label class="form-label fw-semibold">Pilih Produk</label><select id="sku_produk" class="form-select" required></select></div>
             <div class="row">
               <div class="col-md-6 col-12 mb-3">
                 <label class="form-label fw-semibold">Tipe Transaksi</label>
@@ -261,16 +261,16 @@
 
     async function submitProduk(e) {
       e.preventDefault(); showLoader();
-      const idEdit = document.getElementById('edit_id_produk').value;
+      const skuEdit = document.getElementById('edit_sku_produk').value;
       const data = { 
-        id: idEdit, 
+        sku: skuEdit, 
         kategori: document.getElementById('kategori').value, 
         nama: document.getElementById('nama').value, 
         warna: document.getElementById('warna').value 
       };
       
       try {
-        const action = idEdit === "" ? 'simpanProduk' : 'prosesEditProduk';
+        const action = skuEdit === "" ? 'simpanProduk' : 'prosesEditProduk';
         const res = await callAPI(action, data);
         hideLoader();
         if(res.status === 'success') { 
@@ -281,9 +281,8 @@
       } catch(e) { hideLoader(); Swal.fire('Error', 'Terjadi kesalahan sistem', 'error'); }
     }
 
-    // Fungsi edit disesuaikan parameternya
-    function siapkanEdit(id, kat, nama, warna) {
-      document.getElementById('edit_id_produk').value = id; 
+    function siapkanEdit(sku, kat, nama, warna) {
+      document.getElementById('edit_sku_produk').value = sku; 
       document.getElementById('kategori').value = kat; 
       document.getElementById('nama').value = nama; 
       document.getElementById('warna').value = warna;
@@ -292,18 +291,18 @@
     }
 
     function batalEdit() {
-      document.getElementById('formProduk').reset(); document.getElementById('edit_id_produk').value = "";
+      document.getElementById('formProduk').reset(); document.getElementById('edit_sku_produk').value = "";
       const btn = document.getElementById('btn-submit-produk'); btn.innerHTML = '<i class="fas fa-save me-2"></i>Simpan Produk Baru'; btn.classList.replace('btn-warning', 'brand-color');
       document.getElementById('btn-batal-edit').style.display = 'none';
     }
 
-    function hapusProduk(id) {
+    function hapusProduk(sku) {
       Swal.fire({ title: 'Hapus Produk?', text: "Data hilang permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: 'Ya, Hapus!'
       }).then(async (result) => {
         if (result.isConfirmed) {
           showLoader();
           try {
-            const res = await callAPI('prosesHapusProduk', {id: id});
+            const res = await callAPI('prosesHapusProduk', {sku: sku});
             hideLoader();
             if(res.status === 'success') { 
               Swal.fire('Terhapus!', res.message, 'success'); 
@@ -319,15 +318,15 @@
       try {
         const data = await callAPI('getDaftarProduk');
         if(loading) hideLoader();
-        let sel = document.getElementById('id_produk'); sel.innerHTML = '<option value="">-- Pilih --</option>';
-        data.forEach(i => sel.innerHTML += `<option value="${i.id}">${i.nama}</option>`);
+        let sel = document.getElementById('sku_produk'); sel.innerHTML = '<option value="">-- Pilih --</option>';
+        data.forEach(i => sel.innerHTML += `<option value="${i.sku}">${i.nama}</option>`);
       } catch(e) { hideLoader(); }
     }
 
     async function submitLog(e) {
       e.preventDefault(); showLoader();
       const data = { 
-        id_produk: document.getElementById('id_produk').value, 
+        sku_produk: document.getElementById('sku_produk').value, 
         tipe: document.getElementById('tipe').value, 
         qty: document.getElementById('qty').value, 
         keterangan: document.getElementById('keterangan').value 
