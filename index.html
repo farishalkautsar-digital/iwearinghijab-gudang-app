@@ -80,7 +80,7 @@
         <div class="card p-3 p-md-4 border-0 shadow-sm">
           <div class="table-responsive">
             <table id="tabelDashboard" class="table table-striped table-hover w-100 align-middle">
-              <thead class="table-dark"><tr><th>Kategori</th><th>Nama Produk (Ukuran & Warna)</th><th>Kuantitas Sisa</th></tr></thead>
+              <thead class="table-dark"><tr><th>Kategori</th><th>Nama Produk (Warna)</th><th>Kuantitas Sisa</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -93,7 +93,7 @@
           <form id="formProduk" onsubmit="submitProduk(event)">
             <input type="hidden" id="edit_id_produk" value="">
             <div class="row">
-              <div class="col-md-3 col-12 mb-3">
+              <div class="col-md-4 col-12 mb-3">
                 <label class="form-label fw-semibold">Kategori</label>
                 <select id="kategori" class="form-select" required>
                   <option value="">-- Pilih --</option>
@@ -103,8 +103,7 @@
                 </select>
               </div>
               <div class="col-md-4 col-12 mb-3"><label class="form-label fw-semibold">Nama Produk</label><input type="text" id="nama" class="form-control" placeholder="Misal: Paris Jadul" required></div>
-              <div class="col-md-2 col-12 mb-3"><label class="form-label fw-semibold">Ukuran</label><input type="text" id="ukuran" class="form-control" placeholder="110x110 cm" required></div>
-              <div class="col-md-3 col-12 mb-3"><label class="form-label fw-semibold">Warna</label><input type="text" id="warna" class="form-control" placeholder="Sage Green" required></div>
+              <div class="col-md-4 col-12 mb-3"><label class="form-label fw-semibold">Warna</label><input type="text" id="warna" class="form-control" placeholder="Sage Green" required></div>
             </div>
             <div class="d-flex flex-column flex-md-row gap-2">
               <button type="submit" class="btn brand-color w-100" id="btn-submit-produk"><i class="fas fa-save me-2"></i>Simpan Produk Baru</button>
@@ -115,7 +114,7 @@
         <div class="card p-3 p-md-4 border-0 shadow-sm">
           <div class="table-responsive">
             <table id="tabelMaster" class="table table-striped table-hover w-100 align-middle">
-              <thead class="table-dark"><tr><th>ID</th><th>Kategori</th><th>Nama Produk</th><th>Ukuran</th><th>Warna</th><th width="100px">Aksi</th></tr></thead>
+              <thead class="table-dark"><tr><th>ID</th><th>Kategori</th><th>Nama Produk</th><th>Warna</th><th width="100px">Aksi</th></tr></thead>
               <tbody></tbody>
             </table>
           </div>
@@ -158,20 +157,19 @@
   
   <script>
     // =================================================================
-    // 1. GANTI URL DI BAWAH INI DENGAN URL DEPLOY KAMU YANG TERBARU
+    // GANTI URL DI BAWAH INI DENGAN URL DEPLOY KAMU YANG TERBARU
     // =================================================================
-    const API_URL = "https://script.google.com/macros/s/AKfycbwJAzN53VkinXr0PxRWU96imVvIVqHqyIH21LPZgklgYNkdAvfWeN9MOI1FpJpOCMFe/exec"; 
+    const API_URL = "PASTE_URL_KAMU_DISINI"; 
     
     let dtTable, dtMaster;
 
-    // FUNGSI KOMUNIKASI API FINAL
     async function callAPI(action, payload = {}) {
       try {
         const response = await fetch(`${API_URL}?action=${action}`, {
           method: 'POST',
           body: JSON.stringify(payload),
           headers: {
-            'Content-Type': 'text/plain;charset=utf-8' // Melewati preflight CORS
+            'Content-Type': 'text/plain;charset=utf-8' 
           }
         });
         
@@ -183,7 +181,6 @@
       }
     }
 
-    // INIT APLIKASI
     window.onload = function() {
       const activeUser = localStorage.getItem('iw_user');
       if (activeUser) { document.getElementById('user-info').innerText = `Halo, ${activeUser}`; showApp(); }
@@ -192,7 +189,6 @@
     function showLoader() { document.getElementById('loader').style.display = 'block'; }
     function hideLoader() { document.getElementById('loader').style.display = 'none'; }
 
-    // LOGIN
     async function prosesLogin(e) {
       e.preventDefault(); showLoader();
       const data = {
@@ -270,7 +266,6 @@
         id: idEdit, 
         kategori: document.getElementById('kategori').value, 
         nama: document.getElementById('nama').value, 
-        ukuran: document.getElementById('ukuran').value, 
         warna: document.getElementById('warna').value 
       };
       
@@ -286,8 +281,12 @@
       } catch(e) { hideLoader(); Swal.fire('Error', 'Terjadi kesalahan sistem', 'error'); }
     }
 
-    function siapkanEdit(id, kat, nama, uk, warna) {
-      document.getElementById('edit_id_produk').value = id; document.getElementById('kategori').value = kat; document.getElementById('nama').value = nama; document.getElementById('ukuran').value = uk; document.getElementById('warna').value = warna;
+    // Fungsi edit disesuaikan parameternya
+    function siapkanEdit(id, kat, nama, warna) {
+      document.getElementById('edit_id_produk').value = id; 
+      document.getElementById('kategori').value = kat; 
+      document.getElementById('nama').value = nama; 
+      document.getElementById('warna').value = warna;
       const btn = document.getElementById('btn-submit-produk'); btn.innerHTML = '<i class="fas fa-save me-2"></i>Update Data'; btn.classList.replace('brand-color', 'btn-warning');
       document.getElementById('btn-batal-edit').style.display = 'block'; window.scrollTo({ top: 0, behavior: 'smooth' });
     }
