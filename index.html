@@ -16,51 +16,29 @@
     .brand-color:hover { background-color: #ad144b; color: white; }
     .text-brand { color: #d81b60; }
     
-    /* Login Section */
     #login-section { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); }
     .login-card { width: 400px; padding: 40px; border-radius: 15px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
     
-    /* App Section (Desktop Base Layout) */
     #app-section { display: none; min-height: 100vh; flex-direction: row; }
     .sidebar { width: 250px; background: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.05); padding-top: 20px; z-index: 10; transition: all 0.3s; }
     .sidebar .nav-link { color: #495057; padding: 15px 25px; font-weight: 500; border-left: 4px solid transparent; cursor: pointer; transition: all 0.2s; }
     .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #fce4ec; color: #d81b60; border-left: 4px solid #d81b60; }
     .main-content { flex: 1; padding: 30px; overflow-y: auto; height: 100vh; }
     
-    /* Loader */
     #loader { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.8); z-index: 9999; text-align: center; padding-top: 40vh; }
 
-    /* =========================================
-       RESPONSIVE MOBILE (Max Width 768px)
-       ========================================= */
+    /* RESPONSIVE MOBILE */
     @media (max-width: 768px) {
-      /* Ubah struktur flex menjadi kolom */
       #app-section { flex-direction: column; }
-      
-      /* Ruang kosong di bawah untuk Bottom Nav */
       .main-content { padding: 15px; padding-bottom: 90px; height: auto; }
-      
-      /* Merombak Sidebar menjadi Bottom Navigation Bar */
       .sidebar { width: 100%; height: 70px; position: fixed; bottom: 0; left: 0; padding: 0; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); z-index: 1050; display: flex; align-items: center; }
-      
-      /* Sembunyikan Logo/Header di Navbar Bawah */
       .sidebar .text-center { display: none; }
-      
-      /* Susun menu ke samping */
       .sidebar #menu-tabs { flex-direction: row !important; width: 100%; height: 100%; justify-content: space-around; margin: 0; padding: 0; align-items: center; }
-      
-      /* Styling tombol menu ala Aplikasi HP */
       .sidebar .nav-link { padding: 8px 2px; font-size: 11px; text-align: center; border-left: none; border-top: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; }
       .sidebar .nav-link i { margin: 0 0 5px 0 !important; font-size: 20px; }
       .sidebar .nav-link:hover, .sidebar .nav-link.active { border-left: none; border-top: 3px solid #d81b60; background: transparent; color: #d81b60; }
-      
-      /* Hilangkan margin besar di tombol keluar */
       .sidebar li.mt-5 { margin-top: 0 !important; }
-
-      /* Penyesuaian Login Form agar tidak terpotong */
       .login-card { width: 90%; padding: 25px; }
-
-      /* Penyesuaian DataTables (Tombol & Search Box ke tengah) */
       .dt-buttons { display: flex; justify-content: center; margin-bottom: 10px; gap: 5px; }
       .dataTables_filter { text-align: center !important; margin-top: 10px; }
       .dataTables_filter input { width: 100%; margin-left: 0 !important; margin-top: 5px; }
@@ -85,7 +63,6 @@
   </div>
 
   <div id="app-section">
-    
     <div class="sidebar">
       <div class="text-center mb-4 px-3"><h5 class="fw-bold text-brand mt-2">IWearingHijab</h5><small class="text-muted" id="user-info"></small></div>
       <ul class="nav flex-column" id="menu-tabs">
@@ -167,6 +144,7 @@
           </form>
         </div>
       </div>
+      
     </div>
   </div>
 
@@ -179,25 +157,33 @@
   <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
   
   <script>
-    // ================= SANGAT PENTING: GANTI URL DI BAWAH INI =================
-    const API_URL = "ISI_URL_WEB_APP_KAMU_DISINI"; 
+    // =================================================================
+    // 1. GANTI URL DI BAWAH INI DENGAN URL DEPLOY KAMU YANG TERBARU
+    // =================================================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbwJAzN53VkinXr0PxRWU96imVvIVqHqyIH21LPZgklgYNkdAvfWeN9MOI1FpJpOCMFe/exec"; 
     
     let dtTable, dtMaster;
 
-    // FUNGSI KOMUNIKASI API (FETCH)
+    // FUNGSI KOMUNIKASI API FINAL
     async function callAPI(action, payload = {}) {
       try {
-        const res = await fetch(`${API_URL}?action=${action}`, {
+        const response = await fetch(`${API_URL}?action=${action}`, {
           method: 'POST',
           body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' } 
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8' // Melewati preflight CORS
+          }
         });
-        return await res.json();
+        
+        if (!response.ok) throw new Error("Jaringan bermasalah.");
+        return await response.json();
       } catch (err) {
+        console.error("API Error:", err);
         throw new Error('Koneksi terputus');
       }
     }
 
+    // INIT APLIKASI
     window.onload = function() {
       const activeUser = localStorage.getItem('iw_user');
       if (activeUser) { document.getElementById('user-info').innerText = `Halo, ${activeUser}`; showApp(); }
@@ -206,20 +192,24 @@
     function showLoader() { document.getElementById('loader').style.display = 'block'; }
     function hideLoader() { document.getElementById('loader').style.display = 'none'; }
 
+    // LOGIN
     async function prosesLogin(e) {
       e.preventDefault(); showLoader();
-      const u = document.getElementById('username').value;
-      const p = document.getElementById('password').value;
+      const data = {
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+      };
+      
       try {
-        const res = await callAPI('login', {username: u, password: p});
+        const res = await callAPI('login', data);
         hideLoader();
         if(res.status === 'success') {
           localStorage.setItem('iw_user', res.nama);
           document.getElementById('user-info').innerText = `Halo, ${res.nama}`;
-          Swal.fire({ icon: 'success', title: 'Akses Diterima', text: `Selamat bekerja!`, timer: 1500, showConfirmButton: false });
+          Swal.fire({ icon: 'success', title: 'Berhasil', text: `Selamat bekerja!`, timer: 1500, showConfirmButton: false });
           showApp();
         } else { Swal.fire('Ditolak', res.message, 'error'); }
-      } catch(err) { hideLoader(); Swal.fire('Error', 'Gagal memanggil API Server', 'error'); }
+      } catch(err) { hideLoader(); Swal.fire('Error', 'Gagal memanggil Server', 'error'); }
     }
 
     function logout() { localStorage.removeItem('iw_user'); location.reload(); }
@@ -276,12 +266,23 @@
     async function submitProduk(e) {
       e.preventDefault(); showLoader();
       const idEdit = document.getElementById('edit_id_produk').value;
-      const data = { id: idEdit, kategori: document.getElementById('kategori').value, nama: document.getElementById('nama').value, ukuran: document.getElementById('ukuran').value, warna: document.getElementById('warna').value };
+      const data = { 
+        id: idEdit, 
+        kategori: document.getElementById('kategori').value, 
+        nama: document.getElementById('nama').value, 
+        ukuran: document.getElementById('ukuran').value, 
+        warna: document.getElementById('warna').value 
+      };
+      
       try {
-        const res = await callAPI(idEdit === "" ? 'simpanProduk' : 'prosesEditProduk', idEdit === "" ? {payload: data} : {payload: data});
+        const action = idEdit === "" ? 'simpanProduk' : 'prosesEditProduk';
+        const res = await callAPI(action, data);
         hideLoader();
-        if(res.status === 'success') { Swal.fire('Berhasil!', res.message, 'success'); batalEdit(); loadMasterProdukTable(false); loadDropdownProduk(false); loadDashboard(false); }
-        else { Swal.fire('Gagal!', res.message, 'error'); }
+        if(res.status === 'success') { 
+          Swal.fire('Berhasil!', res.message, 'success'); 
+          batalEdit(); 
+          loadMasterProdukTable(false); loadDropdownProduk(false); loadDashboard(false); 
+        } else { Swal.fire('Gagal!', res.message, 'error'); }
       } catch(e) { hideLoader(); Swal.fire('Error', 'Terjadi kesalahan sistem', 'error'); }
     }
 
@@ -298,15 +299,17 @@
     }
 
     function hapusProduk(id) {
-      Swal.fire({ title: 'Hapus Master Produk?', text: "Data hilang permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: 'Ya, Hapus!'
+      Swal.fire({ title: 'Hapus Produk?', text: "Data hilang permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: 'Ya, Hapus!'
       }).then(async (result) => {
         if (result.isConfirmed) {
           showLoader();
           try {
             const res = await callAPI('prosesHapusProduk', {id: id});
             hideLoader();
-            if(res.status === 'success') { Swal.fire('Terhapus!', res.message, 'success'); loadMasterProdukTable(false); loadDropdownProduk(false); loadDashboard(false); }
-            else { Swal.fire('Error', res.message, 'error'); }
+            if(res.status === 'success') { 
+              Swal.fire('Terhapus!', res.message, 'success'); 
+              loadMasterProdukTable(false); loadDropdownProduk(false); loadDashboard(false); 
+            } else { Swal.fire('Error', res.message, 'error'); }
           } catch(e) { hideLoader(); }
         }
       });
@@ -324,12 +327,20 @@
 
     async function submitLog(e) {
       e.preventDefault(); showLoader();
-      const data = { id_produk: document.getElementById('id_produk').value, tipe: document.getElementById('tipe').value, qty: document.getElementById('qty').value, keterangan: document.getElementById('keterangan').value };
+      const data = { 
+        id_produk: document.getElementById('id_produk').value, 
+        tipe: document.getElementById('tipe').value, 
+        qty: document.getElementById('qty').value, 
+        keterangan: document.getElementById('keterangan').value 
+      };
+      
       try {
-        const res = await callAPI('simpanLogStok', {payload: data});
+        const res = await callAPI('simpanLogStok', data);
         hideLoader();
-        if(res.status === 'success') { Swal.fire('Tersimpan!', res.message, 'success'); document.getElementById('formLog').reset(); loadDashboard(false); }
-        else { Swal.fire('Gagal!', res.message, 'error'); }
+        if(res.status === 'success') { 
+          Swal.fire('Tersimpan!', res.message, 'success'); 
+          document.getElementById('formLog').reset(); loadDashboard(false); 
+        } else { Swal.fire('Gagal!', res.message, 'error'); }
       } catch(e) { hideLoader(); Swal.fire('Error', 'Sistem gagal merespon', 'error'); }
     }
   </script>
