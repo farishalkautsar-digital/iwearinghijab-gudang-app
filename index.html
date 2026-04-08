@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>iwearinghijab - Gudang V1.1</title>
+  <title>iwearinghijab - Gudang V1.2</title>
+  
+  <link rel="icon" type="image/png" href="logo_1.png">
   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet">
@@ -14,17 +16,19 @@
   
   <style>
     body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .brand-color { background-color: #d81b60; color: white; }
-    .brand-color:hover { background-color: #ad144b; color: white; }
-    .text-brand { color: #d81b60; }
     
-    #login-section { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); }
+    /* Wana Tema Disinkronkan dengan Logo Klien */
+    .brand-color { background-color: #A47781; color: white; }
+    .brand-color:hover { background-color: #8A616A; color: white; }
+    .text-brand { color: #A47781; }
+    
+    #login-section { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #f2e6e8 0%, #e8d0d5 100%); }
     .login-card { width: 400px; padding: 40px; border-radius: 15px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
     
     #app-section { display: none; min-height: 100vh; flex-direction: row; }
     .sidebar { width: 250px; background: #fff; box-shadow: 2px 0 5px rgba(0,0,0,0.05); padding-top: 20px; z-index: 10; transition: all 0.3s; }
     .sidebar .nav-link { color: #495057; padding: 15px 25px; font-weight: 500; border-left: 4px solid transparent; cursor: pointer; transition: all 0.2s; }
-    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #fce4ec; color: #d81b60; border-left: 4px solid #d81b60; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #f2e6e8; color: #A47781; border-left: 4px solid #A47781; }
     .main-content { flex: 1; padding: 30px; overflow-y: auto; height: 100vh; }
     
     #loader { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.8); z-index: 9999; text-align: center; padding-top: 40vh; }
@@ -38,7 +42,7 @@
       .sidebar #menu-tabs { flex-direction: row !important; width: 100%; height: 100%; justify-content: space-around; margin: 0; padding: 0; align-items: center; }
       .sidebar .nav-link { padding: 8px 2px; font-size: 11px; text-align: center; border-left: none; border-top: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; }
       .sidebar .nav-link i { margin: 0 0 5px 0 !important; font-size: 20px; }
-      .sidebar .nav-link:hover, .sidebar .nav-link.active { border-left: none; border-top: 3px solid #d81b60; background: transparent; color: #d81b60; }
+      .sidebar .nav-link:hover, .sidebar .nav-link.active { border-left: none; border-top: 3px solid #A47781; background: transparent; color: #A47781; }
       .sidebar li.mt-5 { margin-top: 0 !important; }
       .login-card { width: 90%; padding: 25px; }
       .dt-buttons { display: flex; justify-content: center; margin-bottom: 10px; gap: 5px; }
@@ -54,7 +58,8 @@
   <div id="login-section">
     <div class="login-card">
       <div class="text-center mb-4">
-        <h3 class="fw-bold text-brand">iwearinghijab</h3><p class="text-muted">Sistem Manajemen Gudang</p>
+        <img src="logo_1.png" alt="iwearinghijab Logo" style="height: 100px; object-fit: contain; margin-bottom: 10px;">
+        <p class="text-muted mt-2">Sistem Manajemen Gudang</p>
       </div>
       <form id="formLogin" onsubmit="prosesLogin(event)">
         <div class="mb-3"><label class="form-label fw-semibold">Username</label><input type="text" id="username" class="form-control form-control-lg" required></div>
@@ -66,8 +71,9 @@
 
   <div id="app-section">
     <div class="sidebar">
-      <div class="text-center mb-4 px-3">
-        <h5 class="fw-bold text-brand mt-2">iwearinghijab</h5><small class="text-muted" id="user-info"></small>
+      <div class="text-center mb-4 px-3 mt-3">
+        <img src="logo_3.png" alt="iwearinghijab Brand" style="height: 40px; object-fit: contain;">
+        <div class="mt-2"><small class="text-muted fw-semibold" id="user-info"></small></div>
       </div>
       <ul class="nav flex-column" id="menu-tabs">
         <li><a class="nav-link active" onclick="switchTab('dashboard')"><i class="fas fa-chart-pie me-2"></i> Dashboard</a></li>
@@ -80,7 +86,7 @@
     <div class="main-content">
       
       <div id="tab-dashboard" class="content-tab">
-        <h4 class="mb-4 fw-bold">Analytics Dashboard</h4>
+        <h4 class="mb-4 fw-bold text-brand">Analytics Dashboard</h4>
         
         <div class="row mb-4">
           <div class="col-md-5 mb-3">
@@ -115,7 +121,7 @@
       </div>
 
       <div id="tab-master" class="content-tab" style="display: none;">
-        <h4 class="mb-4 fw-bold">Kelola Master Produk</h4>
+        <h4 class="mb-4 fw-bold text-brand">Kelola Master Produk</h4>
         <div class="card p-3 p-md-4 border-0 shadow-sm mb-4">
           <form id="formProduk" onsubmit="submitProduk(event)">
             <input type="hidden" id="edit_sku_produk" value="">
@@ -152,7 +158,7 @@
 
       <div id="tab-stok" class="content-tab" style="display: none;">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-          <h4 class="fw-bold mb-0">Catat Lalu Lintas Barang</h4>
+          <h4 class="fw-bold mb-0 text-brand">Catat Lalu Lintas Barang</h4>
           <button class="btn btn-success disabled w-100 w-md-auto" title="Akan hadir di pembaruan sistem berikutnya"><i class="fas fa-file-excel me-2"></i>Upload Excel Kasir</button>
         </div>
         <div class="card p-3 p-md-4 border-0 shadow-sm col-md-8">
@@ -189,19 +195,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
   <script>
-    // =================================================================
-    // GANTI URL DI BAWAH INI DENGAN URL DEPLOY KAMU YANG TERBARU
-    // =================================================================
+    // URL API OTOMATIS TERPASANG
     const API_URL = "https://script.google.com/macros/s/AKfycbwJAzN53VkinXr0PxRWU96imVvIVqHqyIH21LPZgklgYNkdAvfWeN9MOI1FpJpOCMFe/exec"; 
     
     let dtTable, dtMaster;
-    
-    // Variabel penampung Grafik
     let myPieChart, myBarChart;
     let globalChartData = {};
 
@@ -248,7 +249,6 @@
       document.getElementById(`tab-${tabId}`).style.display = 'block';
       event.currentTarget.classList.add('active');
       
-      // Init ulang form select2 jika tab stok dibuka agar lebarnya presisi
       if(tabId === 'stok') {
         $('#sku_produk').select2({ theme: 'bootstrap-5', width: '100%' });
       }
@@ -278,17 +278,17 @@
       loadDashboard(true); loadMasterProdukTable(false); loadDropdownProduk(false);
     }
 
-    // ======================== LOGIK ANALYTICS CHART ========================
+    // WARNA CHART DISESUAIKAN DENGAN LOGO KLIEN
     function renderPieChart(pieData) {
       const ctx = document.getElementById('pieChart').getContext('2d');
       if(myPieChart) myPieChart.destroy();
       myPieChart = new Chart(ctx, {
-        type: 'doughnut', // Doughnut terlihat lebih elegan dari pie biasa
+        type: 'doughnut',
         data: {
           labels: Object.keys(pieData),
           datasets: [{
             data: Object.values(pieData),
-            backgroundColor: ['#d81b60', '#ff8a80', '#c2185b', '#f48fb1', '#880e4f', '#ff4081', '#f8bbd0'],
+            backgroundColor: ['#A47781', '#B88B96', '#8A616A', '#CFA7B0', '#704B54', '#E6C1C9', '#57373E'],
             borderWidth: 2
           }]
         },
@@ -308,7 +308,7 @@
           datasets: [{
             label: `Stok ${varianName}`,
             data: Object.values(warnaData),
-            backgroundColor: '#d81b60',
+            backgroundColor: '#A47781',
             borderRadius: 4
           }]
         },
@@ -325,40 +325,31 @@
         let pieData = {};
         globalChartData = {};
 
-        // Memecah data mentah untuk konsumsi Chart.js
         data.forEach(row => {
-          const fullName = row[1]; // Format: "Nama Varian (Warna)"
+          const fullName = row[1]; 
           const stok = parseInt(row[2]) || 0;
           let varian = fullName;
           let warna = "Umum";
 
-          // Regex pintar pemisah Varian dan Warna
           const match = fullName.match(/^(.*?)\s*\((.*?)\)$/);
           if(match) { varian = match[1].trim(); warna = match[2].trim(); }
 
-          // Kumpulkan Pie Data (Berdasarkan Varian)
           pieData[varian] = (pieData[varian] || 0) + stok;
-
-          // Kumpulkan Bar Data (Berdasarkan Warna per Varian)
           if(!globalChartData[varian]) globalChartData[varian] = {};
           globalChartData[varian][warna] = (globalChartData[varian][warna] || 0) + stok;
         });
 
         renderPieChart(pieData);
 
-        // Isi dropdown filter varian
         const filterSel = $('#filterVarian');
         filterSel.empty();
         Object.keys(globalChartData).forEach(v => { filterSel.append(`<option value="${v}">${v}</option>`); });
         
-        // Render Bar chart awal
         if(Object.keys(globalChartData).length > 0) { renderBarChart(Object.keys(globalChartData)[0]); }
 
-        // Isi Tabel Biasa
         dtTable.clear(); dtTable.rows.add(data); dtTable.draw();
       } catch(e) { hideLoader(); }
     }
-    // ======================================================================
 
     async function loadMasterProdukTable(loading = true) {
       if(loading) showLoader();
@@ -416,7 +407,6 @@
         sel.empty().append('<option value="">-- Cari atau Pilih Produk --</option>');
         data.forEach(i => sel.append(`<option value="${i.sku}">${i.nama}</option>`));
         
-        // Panggil Select2 untuk membuat fitur Search
         sel.select2({ theme: 'bootstrap-5', width: '100%' });
       } catch(e) { hideLoader(); }
     }
@@ -429,7 +419,6 @@
         hideLoader();
         if(res.status === 'success') { 
           Swal.fire('Tersimpan!', res.message, 'success'); 
-          // Reset Form dan Select2
           document.getElementById('formLog').reset(); 
           $('#sku_produk').val('').trigger('change');
           loadDashboard(false); 
